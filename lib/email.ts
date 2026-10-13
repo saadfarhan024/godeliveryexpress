@@ -69,7 +69,7 @@ export async function sendVerificationEmail(params: {
   await sendEmail({
     to: params.to,
     subject: "Verify your GDE Worldwide Express account",
-    text: `Hello ${params.contactName},\n\nConfirm your email address to submit your GDE business account for review:\n\n${verificationUrl}\n\nThis link expires in 24 hours.\n\nIf you did not receive this earlier or the link expired, request a new one at ${appUrl("/resend-verification")}.`,
+    text: `Hello ${params.contactName},\n\nConfirm your email address to submit your GDE business account for review:\n\n${verificationUrl}\n\nThis link expires in 24 hours. If you do not see this email, check your Spam or Junk folder.\n\nIf you did not receive this earlier or the link expired, request a new one at ${appUrl("/resend-verification")}.`,
   });
 }
 

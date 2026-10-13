@@ -29,15 +29,16 @@ export async function POST(request: Request) {
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return NextResponse.json({ message: "Email address or password is incorrect." }, { status: 401 });
   }
-  if (user.status !== "ACTIVE") {
-    const message = user.status === "PENDING_EMAIL_VERIFICATION"
+  const emailUnverified = user.role === "MERCHANT" && !user.emailVerifiedAt;
+  if (user.status !== "ACTIVE" || emailUnverified) {
+    const message = emailUnverified || user.status === "PENDING_EMAIL_VERIFICATION"
       ? "Verify your email before signing in. You can request a new verification link if needed."
       : user.status === "PENDING_APPROVAL"
         ? "Your email is verified and your account is awaiting GDE approval."
         : "This account cannot sign in. Please contact GDE support for assistance.";
     return NextResponse.json({
       message,
-      ...(user.status === "PENDING_EMAIL_VERIFICATION" ? { resendVerification: true } : {}),
+      ...(emailUnverified || user.status === "PENDING_EMAIL_VERIFICATION" ? { resendVerification: true } : {}),
     }, { status: 403 });
   }
 

@@ -33,10 +33,10 @@ const copy = {
   },
   "resend-verification": {
     panelTitle: "Finish verifying your email.",
-    panelBody: "Enter the email you used to register and we’ll send a fresh verification link if needed.",
+    panelBody: "Enter the email you used to register and we’ll send a fresh verification link if needed. Check your inbox, including Spam or Junk.",
     eyebrow: "Email verification",
     heading: "Resend verification",
-    intro: "We’ll send a new link if an unverified account matches this address.",
+    intro: "We’ll send a new link if an unverified account matches this address. Check your inbox, including Spam or Junk, if it does not arrive.",
     submit: "Send verification link",
     endpoint: "/api/auth/resend-verification",
   },

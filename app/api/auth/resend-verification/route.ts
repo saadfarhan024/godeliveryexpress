@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/email";
 
 const genericResponse = {
-  message: "If an unverified account matches this email address, a new verification link will be sent shortly.",
+  message: "If an unverified account matches this email address, a new verification link will be sent shortly. Check your inbox, including your Spam or Junk folder.",
 };
 
 const RESEND_MIN_INTERVAL_MS = 60 * 1000;

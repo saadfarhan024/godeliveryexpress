@@ -59,7 +59,7 @@ export async function getCurrentUser() {
 
 export async function requireUser() {
   const user = await getCurrentUser();
-  if (!user || user.status !== "ACTIVE") redirect("/login");
+  if (!user || user.status !== "ACTIVE" || (user.role === "MERCHANT" && !user.emailVerifiedAt)) redirect("/login");
   return user;
 }
 

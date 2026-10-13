@@ -53,7 +53,7 @@ export function AdminApplications() {
     };
   }, []);
 
-  const decide = async (application: Application, decision: "approve" | "reject" | "verify_and_approve") => {
+  const decide = async (application: Application, decision: "approve" | "reject") => {
     const reason = decision === "reject" ? window.prompt("Why is this application being rejected?")?.trim() ?? "" : "";
     if (decision === "reject" && !reason) return;
 
@@ -91,7 +91,7 @@ export function AdminApplications() {
           {applications.map((application) => {
             const profile = application.merchantProfile;
             if (!profile) return null;
-            const isUnverified = application.status === "PENDING_EMAIL_VERIFICATION";
+            const isUnverified = !application.emailVerifiedAt;
             return (
               <article className="rounded-xl border border-[#e5e6e9] bg-white p-5 shadow-[0_6px_20px_rgba(24,25,30,0.035)]" key={application.id}>
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -108,7 +108,7 @@ export function AdminApplications() {
                   </div>
                   <div className="flex gap-2">
                     {isUnverified ? (
-                      <button className="rounded-md bg-[#ec8123] px-3.5 py-2 text-[12px] font-semibold text-white hover:bg-[#d9731b] disabled:opacity-60" type="button" disabled={busyId === application.id} onClick={() => decide(application, "verify_and_approve")}>{busyId === application.id ? "Saving…" : "Verify & Approve"}</button>
+                      <span className="rounded-md bg-amber-50 px-3.5 py-2 text-[12px] font-semibold text-amber-800">Waiting for email verification</span>
                     ) : (
                       <button className="rounded-md bg-[#163e6a] px-3.5 py-2 text-[12px] font-semibold text-white hover:bg-[#102f52] disabled:opacity-60" type="button" disabled={busyId === application.id} onClick={() => decide(application, "approve")}>{busyId === application.id ? "Saving…" : "Approve"}</button>
                     )}

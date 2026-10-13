@@ -32,7 +32,7 @@ const clean = (value: unknown) => typeof value === "string" ? value.trim() : "";
 const emailPattern = /^\S+@\S+\.\S+$/;
 
 const successMessage =
-  "Check your email to verify your address. If you do not see it, you can request a new link from the resend verification page.";
+  "Check your email, including your Spam or Junk folder, to verify your address. If you do not see it, you can request a new link from the resend verification page.";
 
 function bankCreateData(input: RegistrationInput) {
   const accountNumber = clean(input.accountNumber);
@@ -186,7 +186,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Registration email could not be sent:", error);
     return NextResponse.json({
-      message: "Your application was saved! You can verify your email address immediately using the button below:",
+      message: "Your application was saved, but the email could not be delivered. Check your Spam or Junk folder, or verify your email immediately using the button below:",
       verificationUrl: verifyPath,
     }, { status: 201 });
   }

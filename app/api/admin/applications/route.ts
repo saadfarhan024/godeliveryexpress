@@ -55,7 +55,7 @@ export async function PATCH(request: Request) {
   const userId = typeof input.userId === "string" ? input.userId : "";
   const decision = input.decision;
   const reason = typeof input.reason === "string" ? input.reason.trim().slice(0, 500) : "";
-  const isApproval = decision === "approve" || decision === "verify_and_approve";
+  const isApproval = decision === "approve";
   if (!userId || (!isApproval && decision !== "reject") || (decision === "reject" && !reason)) {
     return NextResponse.json({ message: "Choose approve or provide a rejection reason." }, { status: 400 });
   }
@@ -73,6 +73,9 @@ export async function PATCH(request: Request) {
   if (!application?.merchantProfile) {
     return NextResponse.json({ message: "This application is no longer pending." }, { status: 404 });
   }
+  if (isApproval && !application.emailVerifiedAt) {
+    return NextResponse.json({ message: "The merchant must verify their email before approval." }, { status: 400 });
+  }
 
   const approved = isApproval;
   const now = new Date();
@@ -81,7 +84,6 @@ export async function PATCH(request: Request) {
       where: { id: application.id },
       data: {
         status: approved ? "ACTIVE" : "REJECTED",
-        ...(approved && !application.emailVerifiedAt ? { emailVerifiedAt: now } : {}),
       },
     }),
     prisma.merchantProfile.update({
