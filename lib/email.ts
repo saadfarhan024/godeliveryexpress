@@ -28,59 +28,30 @@ function getGmailTransporter() {
 }
 
 export async function sendEmail(message: EmailMessage) {
-  // 1. Try Gmail SMTP (unrestricted delivery via Google App Password)
   const gmail = getGmailTransporter();
-  if (gmail) {
-    try {
-      const fromName = process.env.EMAIL_FROM_NAME || "GDE Worldwide Express";
-      await gmail.transporter.sendMail({
-        from: `"${fromName}" <${gmail.user}>`,
-        to: message.to,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
-      });
-      console.info(`[email:gmail] Delivered to ${message.to}: "${message.subject}"`);
-      return;
-    } catch (err) {
-      console.error("[email:gmail] Delivery via Gmail SMTP failed:", err);
-      // Fall through to Resend if available
+  if (!gmail) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Configure GMAIL_USER and GMAIL_APP_PASSWORD to send account emails.");
     }
+
+    console.info(`[development email] To: ${message.to}\nSubject: ${message.subject}\n\n${message.text}`);
+    return;
   }
 
-  // 2. Try Resend API
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-
-  if (apiKey && from) {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [message.to],
-        subject: message.subject,
-        text: message.text,
-      }),
+  try {
+    const fromName = process.env.EMAIL_FROM_NAME || "GDE Worldwide Express";
+    await gmail.transporter.sendMail({
+      from: `"${fromName}" <${gmail.user}>`,
+      to: message.to,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
     });
-
-    if (response.ok) {
-      console.info(`[email:resend] Delivered to ${message.to}: "${message.subject}"`);
-      return;
-    }
-
-    const detail = await response.text();
-    console.error("[email:resend] Delivery failed:", response.status, detail);
+    console.info(`[email:gmail] Delivered to ${message.to}: "${message.subject}"`);
+  } catch (error) {
+    console.error("[email:gmail] Delivery via Gmail SMTP failed:", error);
+    throw new Error("Gmail could not deliver the account email.", { cause: error });
   }
-
-  if (process.env.NODE_ENV === "production" && !gmail && !apiKey) {
-    throw new Error("Configure GMAIL_APP_PASSWORD or RESEND_API_KEY to send account emails.");
-  }
-
-  console.info(`[development email] To: ${message.to}\nSubject: ${message.subject}\n\n${message.text}`);
 }
 
 export function appUrl(path: string) {

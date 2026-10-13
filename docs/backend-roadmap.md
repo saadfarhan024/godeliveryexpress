@@ -6,7 +6,7 @@ This document tracks the work needed to turn the current account and shipment fo
 
 - PostgreSQL runs locally through Podman Compose; Prisma schema and initial migration are present.
 - Merchant registration stores a business profile and encrypts optional bank account and IBAN values.
-- Email verification and password reset use expiring, single-use tokens. Resend delivery is supported; development prints links to the server terminal.
+- Email verification and password reset use expiring, single-use tokens delivered through Gmail SMTP; development prints links to the server terminal when Gmail credentials are absent.
 - Login creates a server-managed session. Merchant and admin page layouts check access on the server.
 - Admins can review and approve or reject pending merchant applications; decisions are audited.
 - Merchants can create shipments and view their own shipment records.

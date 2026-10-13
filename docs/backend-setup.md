@@ -39,7 +39,7 @@ The application uses PostgreSQL and Prisma for persistent users, merchant accoun
 
    The seed may be rerun to refresh that administrator's password. It only promotes the email configured in `.env`.
 
-6. Configure `APP_URL`, `EMAIL_FROM`, and `RESEND_API_KEY` to send verification and password reset email through Resend. In development without email credentials, the complete links are printed to the server terminal. Do not run production without a configured sender and API key.
+6. Configure `APP_URL`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and optionally `EMAIL_FROM_NAME` to send verification and password reset email through Gmail SMTP. In development without email credentials, the complete links are printed to the server terminal. Do not run production without a configured Gmail user and app password.
 
 7. Optional: set `UPLOAD_DIR` for private merchant logo storage (defaults to `./uploads`, which is gitignored).
 
