@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, FileText, Filter, Plus } from "lucide-react";
 import Link from "next/link";
 
+import { TableFilterBar } from "@/components/site/table-filter-bar";
+
 type UnreconciledMerchant = {
   merchantId: string;
   companyName: string;
@@ -67,7 +69,7 @@ export function AdminRemittances() {
 
     fetch(url.toString(), { cache: "no-store" })
       .then(async (res) => {
-        const data = await res.json() as {
+        const data = (await res.json()) as {
           batches?: RemittanceBatch[];
           unreconciledMerchants?: UnreconciledMerchant[];
           message?: string;
@@ -102,7 +104,7 @@ export function AdminRemittances() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ merchantId }),
       });
-      const data = await res.json() as { message?: string };
+      const data = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(data.message ?? "Batch creation failed.");
 
       setMessage(data.message ?? "Batch created successfully.");
@@ -130,7 +132,7 @@ export function AdminRemittances() {
           payoutReference: payoutRef,
         }),
       });
-      const data = await res.json() as { message?: string };
+      const data = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(data.message ?? "Update failed.");
 
       setMessage(data.message ?? "Remittance updated.");
@@ -142,7 +144,8 @@ export function AdminRemittances() {
     }
   };
 
-  if (loading) return <p className="mt-8 text-[14px] text-[#686970]">Loading Finance settlements…</p>;
+  if (loading)
+    return <p className="mt-8 text-[14px] text-[#686970]">Loading Finance settlements…</p>;
 
   return (
     <div className="mt-8 grid gap-6">
@@ -186,11 +189,11 @@ export function AdminRemittances() {
       {/* Tab 1: Settlement Batches */}
       {activeTab === "batches" && (
         <div className="grid gap-4">
-          <div className="flex items-center justify-between rounded-xl border border-[#e5e6e9] bg-white p-3.5">
-            <div className="flex items-center gap-3">
+          <TableFilterBar label="Batch filters" summary={<span>{batches.length} batch(es)</span>}>
+            <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
               <Filter className="size-4 text-[#163e6a]" />
               <select
-                className={inputClass}
+                className={`${inputClass} w-full sm:w-auto`}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -201,11 +204,11 @@ export function AdminRemittances() {
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
-          </div>
+          </TableFilterBar>
 
           <div className="overflow-hidden rounded-2xl border border-[#e5e6e9] bg-white shadow-xs">
             {batches.length > 0 ? (
-              <div className="overflow-x-auto">
+              <div className="min-w-0 max-w-full overflow-x-auto">
                 <table className="w-full min-w-220 border-collapse text-left text-[13px]">
                   <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
                     <tr>
@@ -231,7 +234,9 @@ export function AdminRemittances() {
                       return (
                         <tr key={b.id} className="text-[#45464b] hover:bg-[#fafbfc]">
                           <td className="px-5 py-3.5">
-                            <span className="font-mono font-bold text-[#163e6a]">{b.reference}</span>
+                            <span className="font-mono font-bold text-[#163e6a]">
+                              {b.reference}
+                            </span>
                             <span className="block text-[11px] text-[#85868c]">
                               {new Date(b.createdAt).toLocaleDateString()}
                             </span>
@@ -247,7 +252,9 @@ export function AdminRemittances() {
                             PKR {Number(b.amount).toFixed(2)}
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${style.bg} ${style.text}`}>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${style.bg} ${style.text}`}
+                            >
                               {style.label}
                             </span>
                           </td>
@@ -327,7 +334,7 @@ export function AdminRemittances() {
       {activeTab === "unreconciled" && (
         <div className="overflow-hidden rounded-2xl border border-[#e5e6e9] bg-white shadow-xs">
           {unreconciledMerchants.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="min-w-0 max-w-full overflow-x-auto">
               <table className="w-full min-w-180 border-collapse text-left text-[13px]">
                 <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
                   <tr>
@@ -341,7 +348,9 @@ export function AdminRemittances() {
                   {unreconciledMerchants.map((m) => (
                     <tr key={m.merchantId} className="text-[#45464b] hover:bg-[#fafbfc]">
                       <td className="px-5 py-4 font-bold text-[#202126]">{m.companyName}</td>
-                      <td className="px-5 py-4 font-medium">{m.shipmentCount} delivered parcel(s)</td>
+                      <td className="px-5 py-4 font-medium">
+                        {m.shipmentCount} delivered parcel(s)
+                      </td>
                       <td className="px-5 py-4 font-black text-[#163e6a]">
                         PKR {m.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>

@@ -36,7 +36,7 @@ export function AdminStaffManager() {
     let ignore = false;
     fetch("/api/admin/staff", { cache: "no-store" })
       .then(async (res) => {
-        const data = await res.json() as { staff?: StaffUser[]; message?: string };
+        const data = (await res.json()) as { staff?: StaffUser[]; message?: string };
         if (!res.ok) throw new Error(data.message ?? "Could not load staff.");
         if (!ignore) setStaff(data.staff ?? []);
       })
@@ -69,7 +69,7 @@ export function AdminStaffManager() {
         }),
       });
 
-      const data = await res.json() as { message?: string };
+      const data = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(data.message ?? "Failed to create staff account.");
 
       setMessage(data.message ?? "Staff account created.");
@@ -88,7 +88,7 @@ export function AdminStaffManager() {
     const nextStatus = user.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
     if (
       !confirm(
-        `Are you sure you want to ${nextStatus.toLowerCase()} ${user.email}? This will revoke their active login sessions immediately.`
+        `Are you sure you want to ${nextStatus.toLowerCase()} ${user.email}? This will revoke their active login sessions immediately.`,
       )
     ) {
       return;
@@ -100,7 +100,7 @@ export function AdminStaffManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
       });
-      const data = await res.json() as { message?: string };
+      const data = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(data.message ?? "Status update failed.");
 
       setMessage(data.message ?? "Status updated.");
@@ -117,7 +117,7 @@ export function AdminStaffManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
       });
-      const data = await res.json() as { message?: string };
+      const data = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(data.message ?? "Role update failed.");
 
       setMessage(data.message ?? "Role updated.");
@@ -133,7 +133,8 @@ export function AdminStaffManager() {
     <div className="mt-8 grid gap-6">
       <div className="flex items-center justify-between">
         <p className="m-0 text-[13px] text-[#77787e]">
-          Manage internal staff accounts with role-based access for Operations, Support, Finance, and Administrators.
+          Manage internal staff accounts with role-based access for Operations, Support, Finance,
+          and Administrators.
         </p>
         <button
           type="button"
@@ -144,14 +145,20 @@ export function AdminStaffManager() {
         </button>
       </div>
 
-      {message && <div className="rounded-xl bg-emerald-50 p-4 text-[13px] text-emerald-800">{message}</div>}
+      {message && (
+        <div className="rounded-xl bg-emerald-50 p-4 text-[13px] text-emerald-800">{message}</div>
+      )}
       {error && <div className="rounded-xl bg-red-50 p-4 text-[13px] text-red-700">{error}</div>}
 
       {showAddForm && (
-        <form onSubmit={handleCreate} className="rounded-2xl border border-[#e5e6e9] bg-[#f8fafc] p-6 shadow-xs">
+        <form
+          onSubmit={handleCreate}
+          className="rounded-2xl border border-[#e5e6e9] bg-[#f8fafc] p-6 shadow-xs"
+        >
           <h3 className="m-0 text-[16px] font-semibold text-[#163e6a]">Create New Staff Account</h3>
           <p className="mb-4 mt-1 text-[13px] text-[#64748b]">
-            Assign specific department roles. Passwords must be at least 8 characters with letters and numbers.
+            Assign specific department roles. Passwords must be at least 8 characters with letters
+            and numbers.
           </p>
 
           <div className="grid grid-cols-3 gap-4 max-[650px]:grid-cols-1">
@@ -214,65 +221,133 @@ export function AdminStaffManager() {
       )}
 
       <div className="overflow-hidden rounded-2xl border border-[#e5e6e9] bg-white shadow-xs">
-        <table className="w-full border-collapse text-left text-[13px]">
-          <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
-            <tr>
-              <th className="px-5 py-4 font-semibold">User Email</th>
-              <th className="px-5 py-4 font-semibold">Department Role</th>
-              <th className="px-5 py-4 font-semibold">Status</th>
-              <th className="px-5 py-4 font-semibold">MFA</th>
-              <th className="px-5 py-4 font-semibold">Last Login</th>
-              <th className="px-5 py-4 font-semibold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#eeeeef]">
-            {staff.map((u) => {
-              const isSuspended = u.status === "SUSPENDED";
-              return (
-                <tr key={u.id} className="text-[#45464b] hover:bg-[#fafbfc]">
-                  <td className="px-5 py-3.5 font-medium text-[#202126]">{u.email}</td>
-                  <td className="px-5 py-3.5">
+        <div className="hidden min-w-0 max-w-full overflow-x-auto sm:block">
+          <table className="w-full min-w-180 border-collapse text-left text-[13px]">
+            <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
+              <tr>
+                <th className="px-5 py-4 font-semibold">User Email</th>
+                <th className="px-5 py-4 font-semibold">Department Role</th>
+                <th className="px-5 py-4 font-semibold">Status</th>
+                <th className="px-5 py-4 font-semibold">MFA</th>
+                <th className="px-5 py-4 font-semibold">Last Login</th>
+                <th className="px-5 py-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#eeeeef]">
+              {staff.map((u) => {
+                const isSuspended = u.status === "SUSPENDED";
+                return (
+                  <tr key={u.id} className="text-[#45464b] hover:bg-[#fafbfc]">
+                    <td className="px-5 py-3.5 font-medium text-[#202126]">{u.email}</td>
+                    <td className="px-5 py-3.5">
+                      <select
+                        value={u.role}
+                        onChange={(e) => changeRole(u.id, e.target.value)}
+                        className="rounded border border-[#dedfe2] bg-white px-2 py-1 text-[12px] font-semibold text-[#163e6a]"
+                      >
+                        <option value="OPERATIONS">OPERATIONS</option>
+                        <option value="SUPPORT">SUPPORT</option>
+                        <option value="FINANCE">FINANCE</option>
+                        <option value="ADMIN">ADMIN</option>
+                      </select>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          isSuspended ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-800"
+                        }`}
+                      >
+                        {u.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {u.mfaEnabledAt ? (
+                        <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                          <ShieldCheck className="size-3.5" /> Enforced
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-gray-400">Optional</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 text-[12px] text-[#77787e]">
+                      {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "Never"}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        type="button"
+                        onClick={() => toggleStatus(u)}
+                        className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                          isSuspended
+                            ? "border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50"
+                            : "border border-red-200 bg-white text-red-600 hover:bg-red-50"
+                        }`}
+                      >
+                        {isSuspended ? (
+                          <>
+                            <UserCheck className="size-3" /> Reactivate
+                          </>
+                        ) : (
+                          <>
+                            <UserX className="size-3" /> Suspend
+                          </>
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="divide-y divide-[#edf0f4] sm:hidden">
+          {staff.map((user) => {
+            const isSuspended = user.status === "SUSPENDED";
+            return (
+              <article key={user.id} className="grid gap-3 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="m-0 break-all text-[13px] font-semibold text-[#202126]">
+                      {user.email}
+                    </p>
+                    <p className="mb-0 mt-1 text-[10px] text-[#758196]">
+                      Last login:{" "}
+                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : "Never"}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${isSuspended ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-800"}`}
+                  >
+                    {user.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3 border-t border-[#edf0f4] pt-3">
+                  <label className="grid min-w-0 flex-1 gap-1 text-[10px] font-semibold uppercase tracking-wide text-[#8a96a6]">
+                    Department role
                     <select
-                      value={u.role}
-                      onChange={(e) => changeRole(u.id, e.target.value)}
-                      className="rounded border border-[#dedfe2] bg-white px-2 py-1 text-[12px] font-semibold text-[#163e6a]"
+                      value={user.role}
+                      onChange={(event) => changeRole(user.id, event.target.value)}
+                      className="h-9 min-w-0 rounded-lg border border-[#d9e0e8] bg-white px-2 text-[11px] font-semibold text-[#163e6a]"
                     >
                       <option value="OPERATIONS">OPERATIONS</option>
                       <option value="SUPPORT">SUPPORT</option>
                       <option value="FINANCE">FINANCE</option>
                       <option value="ADMIN">ADMIN</option>
                     </select>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                        isSuspended ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-800"
-                      }`}
-                    >
-                      {u.status}
+                  </label>
+                  <div className="grid justify-items-end gap-2">
+                    <span className="flex items-center gap-1 text-[10px] text-[#758196]">
+                      {user.mfaEnabledAt ? (
+                        <>
+                          <ShieldCheck className="size-3.5 text-emerald-700" /> MFA enabled
+                        </>
+                      ) : (
+                        "MFA optional"
+                      )}
                     </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {u.mfaEnabledAt ? (
-                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
-                        <ShieldCheck className="size-3.5" /> Enforced
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-gray-400">Optional</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3.5 text-[12px] text-[#77787e]">
-                    {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : "Never"}
-                  </td>
-                  <td className="px-5 py-3.5 text-right">
                     <button
                       type="button"
-                      onClick={() => toggleStatus(u)}
-                      className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold ${
-                        isSuspended
-                          ? "border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50"
-                          : "border border-red-200 bg-white text-red-600 hover:bg-red-50"
-                      }`}
+                      onClick={() => toggleStatus(user)}
+                      className={`inline-flex min-h-9 items-center gap-1 rounded-md border px-2.5 text-[11px] font-semibold ${isSuspended ? "border-emerald-300 text-emerald-700" : "border-red-200 text-red-600"}`}
                     >
                       {isSuspended ? (
                         <>
@@ -284,12 +359,12 @@ export function AdminStaffManager() {
                         </>
                       )}
                     </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

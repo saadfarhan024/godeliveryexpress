@@ -51,7 +51,10 @@ export default async function RemittanceStatementPage({ params }: Props) {
         >
           <ArrowLeft className="size-4" /> Back to remittances
         </Link>
-        <PrintButton label="Print Statement" className="inline-flex items-center gap-2 rounded-lg bg-[#163e6a] px-4 py-2 text-[12px] font-semibold text-white shadow-xs hover:bg-[#ec8123]" />
+        <PrintButton
+          label="Print Statement"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#163e6a] px-4 py-2 text-[12px] font-semibold text-white shadow-xs hover:bg-[#ec8123]"
+        />
       </div>
 
       <div className="rounded-2xl border border-[#e5e6e9] bg-white p-8 shadow-[0_8px_24px_rgba(24,25,30,0.04)] print:border-0 print:p-0 print:shadow-none">
@@ -90,7 +93,9 @@ export default async function RemittanceStatementPage({ params }: Props) {
             </p>
             <p className="mb-0 mt-0.5 text-[#45464b]">{remittance.merchant.contactName}</p>
             <p className="mb-0 mt-0.5 text-[#45464b]">{remittance.merchant.pickupAddress}</p>
-            <p className="mb-0 mt-0.5 text-[#77787e]">{remittance.merchant.city} · {remittance.merchant.phone}</p>
+            <p className="mb-0 mt-0.5 text-[#77787e]">
+              {remittance.merchant.city} · {remittance.merchant.phone}
+            </p>
           </div>
 
           <div className="rounded-xl bg-[#f8fafc] p-4">
@@ -109,7 +114,8 @@ export default async function RemittanceStatementPage({ params }: Props) {
             </div>
             {remittance.payoutReference && (
               <p className="mb-0 mt-2 text-[12px] text-[#45464b]">
-                Bank Reference / UTR: <strong className="font-mono">{remittance.payoutReference}</strong>
+                Bank Reference / UTR:{" "}
+                <strong className="font-mono">{remittance.payoutReference}</strong>
               </p>
             )}
             {remittance.paidAt && (
@@ -125,8 +131,8 @@ export default async function RemittanceStatementPage({ params }: Props) {
           <p className="mb-3 text-[14px] font-bold text-[#202126]">
             Reconciled Deliveries ({remittance.shipments.length} parcels)
           </p>
-          <div className="overflow-x-auto rounded-xl border border-[#eeeeef]">
-            <table className="w-full text-left text-[12px]">
+          <div className="min-w-0 max-w-full overflow-x-auto rounded-xl border border-[#eeeeef]">
+            <table className="w-full min-w-180 text-left text-[12px]">
               <thead className="bg-[#f8f9fa] text-[11px] uppercase tracking-wide text-[#77787e]">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Tracking Code</th>

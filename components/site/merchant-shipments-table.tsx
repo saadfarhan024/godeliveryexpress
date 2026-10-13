@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Download, FileUp, Printer, Search, ArrowLeft, ArrowRight } from "lucide-react";
 import { formatStatusLabel } from "@/lib/shipments";
 
+import { TableFilterBar } from "@/components/site/table-filter-bar";
+
 export type MerchantShipmentRow = {
   id: string;
   trackingCode: string;
@@ -18,7 +20,11 @@ export type MerchantShipmentRow = {
   source?: string;
 };
 
-export function MerchantShipmentsTable({ initialShipments }: { initialShipments: MerchantShipmentRow[] }) {
+export function MerchantShipmentsTable({
+  initialShipments,
+}: {
+  initialShipments: MerchantShipmentRow[];
+}) {
   const [shipments] = useState<MerchantShipmentRow[]>(initialShipments);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -26,7 +32,9 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
   const [page, setPage] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
-  const [importStatus, setImportStatus] = useState<{ message?: string; error?: string } | null>(null);
+  const [importStatus, setImportStatus] = useState<{ message?: string; error?: string } | null>(
+    null,
+  );
   const pageSize = 15;
 
   const cities = useMemo(() => {
@@ -69,7 +77,11 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
         body: formData,
       });
 
-      const data = await res.json() as { message?: string; importedCount?: number; errors?: string[] };
+      const data = (await res.json()) as {
+        message?: string;
+        importedCount?: number;
+        errors?: string[];
+      };
       if (!res.ok) throw new Error(data.message ?? "Bulk import failed.");
 
       setImportStatus({
@@ -88,9 +100,12 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
   return (
     <div className="mt-8 grid gap-5">
       {/* Search, Filter, Export & Import Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e5e6e9] bg-white p-4.5 shadow-[0_4px_16px_rgba(24,25,30,0.02)]">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative">
+      <TableFilterBar
+        label="Shipment filters"
+        summary={<span>{filteredShipments.length} matching shipment(s)</span>}
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="relative min-w-0">
             <Search className="absolute left-3 top-3 size-4 text-[#8a8b92]" />
             <input
               type="text"
@@ -100,7 +115,7 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="h-10 w-64 rounded-lg border border-[#dedfe2] bg-white pl-9 pr-3 text-[13px] text-[#25262a] outline-none focus:border-[#163e6a]"
+              className="h-10 w-full rounded-lg border border-[#dedfe2] bg-white pl-9 pr-3 text-[13px] text-[#25262a] outline-none focus:border-[#163e6a] sm:w-64"
             />
           </div>
 
@@ -110,7 +125,7 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-lg border border-[#dedfe2] bg-white px-3 text-[13px] text-[#25262a] outline-none"
+            className="h-10 w-full rounded-lg border border-[#dedfe2] bg-white px-3 text-[13px] text-[#25262a] outline-none sm:w-auto"
           >
             <option value="ALL">All Statuses</option>
             <option value="CREATED">Created</option>
@@ -133,7 +148,7 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
                 setCityFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-10 rounded-lg border border-[#dedfe2] bg-white px-3 text-[13px] text-[#25262a] outline-none"
+              className="h-10 w-full rounded-lg border border-[#dedfe2] bg-white px-3 text-[13px] text-[#25262a] outline-none sm:w-auto"
             >
               <option value="ALL">All Cities</option>
               {cities.map((c) => (
@@ -145,23 +160,23 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
           )}
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={() => setIsImporting((v) => !v)}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-[#dedfe2] bg-white px-3.5 text-[12px] font-semibold text-[#45464b] hover:bg-[#f7f7f8]"
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[#dedfe2] bg-white px-3.5 text-[12px] font-semibold text-[#45464b] hover:bg-[#f7f7f8]"
           >
             <FileUp className="size-4 text-[#163e6a]" /> Import CSV
           </button>
           <a
             href="/api/account/shipments/export"
             download
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-[#dedfe2] bg-white px-3.5 text-[12px] font-semibold text-[#45464b] hover:bg-[#f7f7f8]"
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[#dedfe2] bg-white px-3.5 text-[12px] font-semibold text-[#45464b] hover:bg-[#f7f7f8]"
           >
             <Download className="size-4 text-[#163e6a]" /> Export CSV
           </a>
         </div>
-      </div>
+      </TableFilterBar>
 
       {/* Bulk CSV Import Panel */}
       {isImporting && (
@@ -169,11 +184,10 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
           onSubmit={handleImportSubmit}
           className="rounded-2xl border border-[#163e6a]/20 bg-[#f8fafc] p-6 shadow-xs"
         >
-          <h3 className="m-0 text-[15px] font-semibold text-[#163e6a]">
-            Bulk CSV Shipment Import
-          </h3>
+          <h3 className="m-0 text-[15px] font-semibold text-[#163e6a]">Bulk CSV Shipment Import</h3>
           <p className="mb-4 mt-1 text-[13px] text-[#64748b]">
-            Upload a CSV with columns: Recipient Name, Recipient Phone, Delivery Address, Destination City, Pieces, COD Amount, Item Description.
+            Upload a CSV with columns: Recipient Name, Recipient Phone, Delivery Address,
+            Destination City, Pieces, COD Amount, Item Description.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -198,9 +212,7 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
             </p>
           )}
           {importStatus?.error && (
-            <p className="mb-0 mt-3 text-[13px] font-medium text-red-600">
-              {importStatus.error}
-            </p>
+            <p className="mb-0 mt-3 text-[13px] font-medium text-red-600">{importStatus.error}</p>
           )}
         </form>
       )}
@@ -208,64 +220,109 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
       {/* Main Shipments Table */}
       <div className="overflow-hidden rounded-2xl border border-[#e5e6e9] bg-white shadow-[0_8px_24px_rgba(24,25,30,0.04)]">
         {paginatedShipments.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-180 border-collapse text-left text-[13px]">
-              <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
-                <tr>
-                  <th className="px-5 py-4 font-semibold">Tracking code</th>
-                  <th className="px-5 py-4 font-semibold">Recipient</th>
-                  <th className="px-5 py-4 font-semibold">Destination</th>
-                  <th className="px-5 py-4 font-semibold">Status</th>
-                  <th className="px-5 py-4 font-semibold">Created</th>
-                  <th className="px-5 py-4 font-semibold">Source</th>
-                  <th className="px-5 py-4 font-semibold">COD</th>
-                  <th className="px-5 py-4 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#eeeeef]">
-                {paginatedShipments.map((s) => (
-                  <tr key={s.id} className="text-[#45464b] transition hover:bg-[#fafbfc]">
-                    <td className="px-5 py-3.5">
-                      <Link
-                        href={`/account/shipments/${s.trackingCode}`}
-                        className="font-mono font-semibold text-[#163e6a] hover:underline"
-                      >
-                        {s.trackingCode}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3.5 font-medium text-[#25262a]">{s.recipientName}</td>
-                    <td className="px-5 py-3.5">{s.destinationCity}</td>
-                    <td className="px-5 py-3.5">
-                      <span className="rounded-full bg-[#f0f4f8] px-2.5 py-1 text-[11px] font-semibold text-[#163e6a]">
-                        {formatStatusLabel(s.status)}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-[#77787e]">
-                      {new Date(s.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-5 py-3.5 text-[#77787e]">{s.source ?? "Merchant portal"}</td>
-                    <td className="px-5 py-3.5 font-medium">
-                      {s.codAmount ? `PKR ${s.codAmount.toFixed(2)}` : "—"}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <a
-                        href={`/account/shipments/${s.trackingCode}/label`}
-                        target="_blank"
-                        rel="noreferrer"
-                        title="Print shipping label"
-                        className="inline-flex items-center gap-1 rounded-md border border-[#dedfe2] px-2.5 py-1 text-[11px] font-semibold text-[#163e6a] hover:bg-[#f3f4f6]"
-                      >
-                        <Printer className="size-3" /> Label
-                      </a>
-                    </td>
+          <>
+            <div className="hidden min-w-0 max-w-full overflow-x-auto sm:block">
+              <table className="w-full min-w-180 border-collapse text-left text-[13px]">
+                <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
+                  <tr>
+                    <th className="px-5 py-4 font-semibold">Tracking code</th>
+                    <th className="px-5 py-4 font-semibold">Recipient</th>
+                    <th className="px-5 py-4 font-semibold">Destination</th>
+                    <th className="px-5 py-4 font-semibold">Status</th>
+                    <th className="px-5 py-4 font-semibold">Created</th>
+                    <th className="px-5 py-4 font-semibold">Source</th>
+                    <th className="px-5 py-4 font-semibold">COD</th>
+                    <th className="px-5 py-4 font-semibold text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[#eeeeef]">
+                  {paginatedShipments.map((s) => (
+                    <tr key={s.id} className="text-[#45464b] transition hover:bg-[#fafbfc]">
+                      <td className="px-5 py-3.5">
+                        <Link
+                          href={`/account/shipments/${s.trackingCode}`}
+                          className="font-mono font-semibold text-[#163e6a] hover:underline"
+                        >
+                          {s.trackingCode}
+                        </Link>
+                      </td>
+                      <td className="px-5 py-3.5 font-medium text-[#25262a]">{s.recipientName}</td>
+                      <td className="px-5 py-3.5">{s.destinationCity}</td>
+                      <td className="px-5 py-3.5">
+                        <span className="rounded-full bg-[#f0f4f8] px-2.5 py-1 text-[11px] font-semibold text-[#163e6a]">
+                          {formatStatusLabel(s.status)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-[#77787e]">
+                        {new Date(s.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-3.5 text-[#77787e]">
+                        {s.source ?? "Merchant portal"}
+                      </td>
+                      <td className="px-5 py-3.5 font-medium">
+                        {s.codAmount ? `PKR ${s.codAmount.toFixed(2)}` : "—"}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <a
+                          href={`/account/shipments/${s.trackingCode}/label`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Print shipping label"
+                          className="inline-flex items-center gap-1 rounded-md border border-[#dedfe2] px-2.5 py-1 text-[11px] font-semibold text-[#163e6a] hover:bg-[#f3f4f6]"
+                        >
+                          <Printer className="size-3" /> Label
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="divide-y divide-[#edf0f4] sm:hidden">
+              {paginatedShipments.map((shipment) => (
+                <article key={shipment.id} className="grid gap-3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/account/shipments/${shipment.trackingCode}`}
+                        className="break-all font-mono text-[12px] font-bold text-[#163e6a]"
+                      >
+                        {shipment.trackingCode}
+                      </Link>
+                      <p className="mb-0 mt-1 break-words text-[14px] font-semibold text-[#25262a]">
+                        {shipment.recipientName}
+                      </p>
+                      <p className="mb-0 mt-1 text-[12px] text-[#758196]">
+                        {shipment.destinationCity} ·{" "}
+                        {new Date(shipment.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-[#f0f4f8] px-2.5 py-1 text-[10px] font-semibold text-[#163e6a]">
+                      {formatStatusLabel(shipment.status)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-[#edf0f4] pt-3 text-[12px]">
+                    <span className="text-[#758196]">
+                      COD {shipment.codAmount ? `PKR ${shipment.codAmount.toFixed(2)}` : "—"}
+                    </span>
+                    <a
+                      href={`/account/shipments/${shipment.trackingCode}/label`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 rounded-md border border-[#dedfe2] px-2.5 py-1.5 font-semibold text-[#163e6a]"
+                    >
+                      <Printer className="size-3" /> Label
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="px-6 py-14 text-center">
-            <h2 className="m-0 text-[19px] font-semibold text-[#25262a]">No shipments match criteria</h2>
+            <h2 className="m-0 text-[19px] font-semibold text-[#25262a]">
+              No shipments match criteria
+            </h2>
             <p className="mb-0 mt-2 text-[14px] text-[#6d6e74]">
               Try adjusting your search terms or status filters.
             </p>
@@ -274,9 +331,7 @@ export function MerchantShipmentsTable({ initialShipments }: { initialShipments:
 
         {/* Pagination Bar */}
         <div className="flex items-center justify-between border-t border-[#eeeeef] bg-[#fafbfc] px-5 py-3.5 text-[12px] text-[#85868c]">
-          <span>
-            Showing {filteredShipments.length} shipment(s)
-          </span>
+          <span>Showing {filteredShipments.length} shipment(s)</span>
           {totalPages > 1 && (
             <div className="flex items-center gap-3">
               <button

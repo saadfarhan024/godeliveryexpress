@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Filter, Headphones } from "lucide-react";
 
+import { TableFilterBar } from "@/components/site/table-filter-bar";
+
 type TicketSummary = {
   id: string;
   subject: string;
@@ -54,12 +56,13 @@ export function AdminTicketsQueue() {
 
     fetch(url.toString(), { cache: "no-store" })
       .then(async (res) => {
-        const data = await res.json() as { tickets?: TicketSummary[]; message?: string };
+        const data = (await res.json()) as { tickets?: TicketSummary[]; message?: string };
         if (!res.ok) throw new Error(data.message ?? "Could not load support tickets.");
         if (!ignore) setTickets(data.tickets ?? []);
       })
       .catch((err) => {
-        if (!ignore) setError(err instanceof Error ? err.message : "Failed to load support tickets.");
+        if (!ignore)
+          setError(err instanceof Error ? err.message : "Failed to load support tickets.");
       })
       .finally(() => {
         if (!ignore) setLoading(false);
@@ -74,13 +77,18 @@ export function AdminTicketsQueue() {
 
   return (
     <div className="mt-8 grid gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#e5e6e9] bg-white p-4">
-        <div className="flex flex-wrap items-center gap-3">
+      <TableFilterBar
+        label="Queue filters"
+        summary={<span>Showing {tickets.length} ticket(s)</span>}
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Filter className="size-4 text-[#163e6a]" />
-          <span className="text-[13px] font-semibold text-[#202126]">Queue Filters:</span>
+          <span className="hidden text-[13px] font-semibold text-[#202126] sm:inline">
+            Queue filters
+          </span>
 
           <select
-            className={inputClass}
+            className={`${inputClass} w-full sm:w-auto`}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -93,7 +101,7 @@ export function AdminTicketsQueue() {
           </select>
 
           <select
-            className={inputClass}
+            className={`${inputClass} w-full sm:w-auto`}
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
           >
@@ -104,11 +112,7 @@ export function AdminTicketsQueue() {
             <option value="URGENT">Urgent</option>
           </select>
         </div>
-
-        <span className="text-[12px] text-[#85868c]">
-          Showing {tickets.length} ticket(s)
-        </span>
-      </div>
+      </TableFilterBar>
 
       {error && (
         <div className="rounded-xl bg-red-50 p-4 text-[13px] text-red-700" role="alert">
@@ -118,77 +122,160 @@ export function AdminTicketsQueue() {
 
       <div className="overflow-hidden rounded-2xl border border-[#e5e6e9] bg-white shadow-xs">
         {tickets.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-220 border-collapse text-left text-[13px]">
-              <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
-                <tr>
-                  <th className="px-5 py-4 font-semibold">Ticket</th>
-                  <th className="px-5 py-4 font-semibold">Merchant</th>
-                  <th className="px-5 py-4 font-semibold">Status</th>
-                  <th className="px-5 py-4 font-semibold">Priority</th>
-                  <th className="px-5 py-4 font-semibold">Assigned To</th>
-                  <th className="px-5 py-4 font-semibold">Updated</th>
-                  <th className="px-5 py-4 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#eeeeef]">
-                {tickets.map((t) => {
-                  const pill = statusPills[t.status] ?? {
-                    bg: "bg-gray-100",
-                    text: "text-gray-700",
-                    label: t.status,
-                  };
-                  return (
-                    <tr key={t.id} className="text-[#45464b] hover:bg-[#fafbfc]">
-                      <td className="px-5 py-3.5">
+          <>
+            <div className="hidden min-w-0 max-w-full overflow-x-auto sm:block">
+              <table className="w-full min-w-220 border-collapse text-left text-[13px]">
+                <thead className="bg-[#f8f8f9] text-[11px] uppercase tracking-wide text-[#77787e]">
+                  <tr>
+                    <th className="px-5 py-4 font-semibold">Ticket</th>
+                    <th className="px-5 py-4 font-semibold">Merchant</th>
+                    <th className="px-5 py-4 font-semibold">Status</th>
+                    <th className="px-5 py-4 font-semibold">Priority</th>
+                    <th className="px-5 py-4 font-semibold">Assigned To</th>
+                    <th className="px-5 py-4 font-semibold">Updated</th>
+                    <th className="px-5 py-4 font-semibold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#eeeeef]">
+                  {tickets.map((t) => {
+                    const pill = statusPills[t.status] ?? {
+                      bg: "bg-gray-100",
+                      text: "text-gray-700",
+                      label: t.status,
+                    };
+                    return (
+                      <tr key={t.id} className="text-[#45464b] hover:bg-[#fafbfc]">
+                        <td className="px-5 py-3.5">
+                          <Link
+                            href={`/admin/tickets/${t.id}`}
+                            className="font-semibold text-[#163e6a] hover:underline"
+                          >
+                            {t.subject}
+                          </Link>
+                          <span className="block font-mono text-[11px] text-[#85868c]">
+                            #{t.id.slice(-6).toUpperCase()} · {t._count.messages} messages
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className="font-semibold text-[#202126]">
+                            {t.merchant.companyName}
+                          </span>
+                          <span className="block text-[11px] text-[#77787e]">
+                            {t.merchant.contactName} ({t.merchant.user.email})
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${pill.bg} ${pill.text}`}
+                          >
+                            {pill.label}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span
+                            className={`text-[12px] uppercase ${priorityStyles[t.priority] ?? ""}`}
+                          >
+                            {t.priority}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-[12px]">
+                          {t.assignedTo ? (
+                            t.assignedTo.email
+                          ) : (
+                            <span className="text-gray-400">Unassigned</span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-[12px] text-[#77787e]">
+                          {new Date(t.updatedAt).toLocaleString()}
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <Link
+                            href={`/admin/tickets/${t.id}`}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#dedfe2] px-3 py-1.5 text-[12px] font-semibold text-[#163e6a] hover:bg-[#f3f4f6]"
+                          >
+                            Open & Reply
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="divide-y divide-[#edf0f4] sm:hidden">
+              {tickets.map((ticket) => {
+                const pill = statusPills[ticket.status] ?? {
+                  bg: "bg-gray-100",
+                  text: "text-gray-700",
+                  label: ticket.status,
+                };
+                return (
+                  <article key={ticket.id} className="grid gap-3 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
                         <Link
-                          href={`/admin/tickets/${t.id}`}
-                          className="font-semibold text-[#163e6a] hover:underline"
+                          href={`/admin/tickets/${ticket.id}`}
+                          className="break-words text-[14px] font-semibold text-[#163e6a]"
                         >
-                          {t.subject}
+                          {ticket.subject}
                         </Link>
-                        <span className="block font-mono text-[11px] text-[#85868c]">
-                          #{t.id.slice(-6).toUpperCase()} · {t._count.messages} messages
+                        <p className="mb-0 mt-1 text-[11px] text-[#758196]">
+                          #{ticket.id.slice(-6).toUpperCase()} · {ticket._count.messages} messages
+                        </p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${pill.bg} ${pill.text}`}
+                      >
+                        {pill.label}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 border-t border-[#edf0f4] pt-3 text-[11px]">
+                      <div className="min-w-0">
+                        <span className="block uppercase tracking-wide text-[#8a96a6]">
+                          Merchant
                         </span>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className="font-semibold text-[#202126]">
-                          {t.merchant.companyName}
+                        <span className="mt-1 block break-words font-medium text-[#34445a]">
+                          {ticket.merchant.companyName}
                         </span>
-                        <span className="block text-[11px] text-[#77787e]">
-                          {t.merchant.contactName} ({t.merchant.user.email})
+                      </div>
+                      <div>
+                        <span className="block uppercase tracking-wide text-[#8a96a6]">
+                          Priority
                         </span>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${pill.bg} ${pill.text}`}>
-                          {pill.label}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <span className={`text-[12px] uppercase ${priorityStyles[t.priority] ?? ""}`}>
-                          {t.priority}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-[12px]">
-                        {t.assignedTo ? t.assignedTo.email : <span className="text-gray-400">Unassigned</span>}
-                      </td>
-                      <td className="px-5 py-3.5 text-[12px] text-[#77787e]">
-                        {new Date(t.updatedAt).toLocaleString()}
-                      </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <Link
-                          href={`/admin/tickets/${t.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#dedfe2] px-3 py-1.5 text-[12px] font-semibold text-[#163e6a] hover:bg-[#f3f4f6]"
+                        <span
+                          className={`mt-1 block font-semibold ${priorityStyles[ticket.priority] ?? ""}`}
                         >
-                          Open & Reply
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                          {ticket.priority}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <span className="block uppercase tracking-wide text-[#8a96a6]">
+                          Assigned to
+                        </span>
+                        <span className="mt-1 block break-all text-[#34445a]">
+                          {ticket.assignedTo?.email ?? "Unassigned"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="block uppercase tracking-wide text-[#8a96a6]">
+                          Updated
+                        </span>
+                        <span className="mt-1 block text-[#34445a]">
+                          {new Date(ticket.updatedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/admin/tickets/${ticket.id}`}
+                      className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[#d8e0e8] text-[12px] font-semibold text-[#163e6a]"
+                    >
+                      Open and reply
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center text-[#77787e]">
             <Headphones className="mx-auto size-9 text-[#a0a1a8]" />
