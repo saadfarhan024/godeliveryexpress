@@ -179,20 +179,16 @@ export async function POST(request: Request) {
     });
   }
 
-  const verifyPath = `/verify-email?token=${encodeURIComponent(verificationToken)}`;
-
   try {
     await sendVerificationEmail({ to: email, contactName: contact, token: verificationToken });
   } catch (error) {
     console.error("Registration email could not be sent:", error);
     return NextResponse.json({
-      message: "Your application was saved, but the email could not be delivered. Check your Spam or Junk folder, or verify your email immediately using the button below:",
-      verificationUrl: verifyPath,
+      message: "Your application was saved, but the email could not be delivered. Check your Spam or Junk folder, then request a new link from the resend verification page.",
     }, { status: 201 });
   }
 
   return NextResponse.json({
     message: successMessage,
-    verificationUrl: verifyPath,
   }, { status: 201 });
 }

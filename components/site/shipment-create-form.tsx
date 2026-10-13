@@ -9,6 +9,12 @@ const fieldClass = "mt-2 h-12.5 w-full rounded-lg border border-[#d7d8da] bg-whi
 const readonlyClass = "bg-[#f0f0ef] text-[#75767a]";
 const labelClass = "block text-[13px] font-semibold text-[#74757b]";
 const requiredMark = <span className="text-[#ed171d]">*</span>;
+const todayDate = (() => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+})();
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section className="overflow-hidden rounded-lg border border-[#dedfe2]"><h2 className="m-0 bg-[#202426] px-5 py-3 text-[17px] font-medium text-white">{title}</h2><div className="grid gap-5 p-5">{children}</div></section>;
@@ -60,7 +66,7 @@ export function ShipmentCreateForm({ pickupDefaults, pickupProfiles }: { pickupD
       <div className="grid grid-cols-3 gap-5 max-[760px]:grid-cols-1">
       <Field label="Product Type" name="productType" required><select className={fieldClass} id="productType" name="productType" value={inputs.productType} onChange={(event) => setInputs({ ...inputs, productType: event.target.value })} required><option>Parcel</option><option>Document</option><option>Fragile</option><option>Electronics</option></select></Field>
       <Field label="Service Type" name="serviceType" required><select className={fieldClass} id="serviceType" name="serviceType" value={inputs.serviceType} onChange={(event) => setInputs({ ...inputs, serviceType: event.target.value })} required><option>Overnight</option><option>Same Day</option><option>Economy</option><option>International</option></select></Field>
-      <Field label="Order Date" name="orderDate" required><input className={fieldClass} id="orderDate" name="orderDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} required /></Field>
+      <Field label="Order Date" name="orderDate" required><input className={fieldClass} id="orderDate" name="orderDate" type="date" min={todayDate} defaultValue={todayDate} required /></Field>
       </div>
     </div>
 

@@ -38,6 +38,17 @@ type ShipmentInput = {
 
 const text = (value: unknown) => typeof value === "string" ? value.trim() : "";
 
+function pakistanDateToday() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Karachi",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.status !== "ACTIVE" || user.role !== "MERCHANT" || !user.merchantProfile) {
@@ -59,7 +70,8 @@ export async function POST(request: Request) {
   const destinationCity = text(input.destinationCity);
   const productType = text(input.productType) || "Parcel";
   const serviceType = text(input.serviceType) || "Overnight";
-  const orderDate = input.orderDate ? new Date(`${text(input.orderDate)}T00:00:00.000Z`) : new Date();
+  const orderDateText = text(input.orderDate) || pakistanDateToday();
+  const orderDate = new Date(`${orderDateText}T00:00:00.000Z`);
   const pickupCity = text(input.pickupCity);
   const pickupProfile = text(input.pickupProfile);
   const pickupName = text(input.pickupName);
@@ -85,7 +97,7 @@ export async function POST(request: Request) {
     if (!profile) return NextResponse.json({ message: "The selected pickup profile is unavailable." }, { status: 400 });
   }
 
-  if (!recipientName || recipientName.length > 160 || !recipientPhone || recipientPhone.length > 40 || (recipientEmail && recipientEmail.length > 254) || !deliveryAddress || deliveryAddress.length > 1000 || !destinationCity || destinationCity.length > 100 || !itemDescription || itemDescription.length > 500 || !Number.isInteger(pieces) || pieces < 1 || pieces > 100 || !Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 1000 || (codAmount !== null && (!Number.isFinite(codAmount) || codAmount < 0 || codAmount > 100_000_000))) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(orderDateText) || Number.isNaN(orderDate.getTime()) || orderDateText < pakistanDateToday() || !recipientName || recipientName.length > 160 || !recipientPhone || recipientPhone.length > 40 || (recipientEmail && recipientEmail.length > 254) || !deliveryAddress || deliveryAddress.length > 1000 || !destinationCity || destinationCity.length > 100 || !itemDescription || itemDescription.length > 500 || !Number.isInteger(pieces) || pieces < 1 || pieces > 100 || !Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 1000 || (codAmount !== null && (!Number.isFinite(codAmount) || codAmount < 0 || codAmount > 100_000_000))) {
     return NextResponse.json({ message: "Check the order, pickup, delivery, parcel, and price details." }, { status: 400 });
   }
 
