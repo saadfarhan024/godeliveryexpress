@@ -119,12 +119,10 @@ export default function PrivacyPolicyPage() {
           For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at <a className={linkClass} href="mailto:info@godeliveryexpress.pk">info@godeliveryexpress.pk</a> or by mail using the details provided below:
         </p>
         <address className="not-italic text-[15px] leading-[1.8] text-[#5b5c62]">
-          Shop-40 Liaqat Market<br />
-          Near New Memon Masjid<br />
-          Bolton Market<br />
-          M.A Jinaah Road<br />
-          Karachi, Pakistan<br />
-          Phone Number: <a className={linkClass} href="tel:+923363587468">+92 336 3587468</a> / <a className={linkClass} href="tel:+922132410335">+92 21 32410335</a>
+          Shop #4, Mezzanine Floor<br />
+          Sheikh Mansion, Out Ram Road<br />
+          Haqqani Chowk, Karachi.<br />
+          Phone Number: <a className={linkClass} href="tel:+923152402683">+92-3152402683</a>
         </address>
       </article>
       <SiteFooter />

@@ -69,8 +69,7 @@ export default function ContactUsPage() {
                   <Phone aria-hidden="true" className="size-5" />
                 </span>
                 <h3 className="mb-2 text-[15px] font-semibold text-[#ec8123]">Phone number</h3>
-                <a className="block py-1 text-[14px] text-white/85 hover:text-white" href="tel:+923363587468">+92 336 3587468</a>
-                <a className="block py-1 text-[14px] text-white/85 hover:text-white" href="tel:+922132410335">+92 21 32410335</a>
+                <a className="block py-1 text-[14px] text-white/85 hover:text-white" href="tel:+923152402683">+92-3152402683</a>
               </div>
               <div>
                 <span className="mb-3.5 grid size-12 place-items-center rounded-full border-2 border-white text-white">
@@ -78,7 +77,7 @@ export default function ContactUsPage() {
                 </span>
                 <h3 className="mb-2 text-[15px] font-semibold text-[#ec8123]">Address</h3>
                 <p className="m-0 max-w-55 text-[13px] uppercase leading-[1.7] tracking-[0.04em] text-white/80">
-                  Shop-40 Liaquat Market, near New Memon Masjid, Bolton Market, M.A. Jinnah Road, Karachi, Pakistan
+                  Shop #4, Mezzanine Floor, Sheikh Mansion, Out Ram Road, Haqqani Chowk, Karachi.
                 </p>
               </div>
             </div>

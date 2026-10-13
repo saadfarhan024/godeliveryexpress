@@ -38,12 +38,12 @@ export function SiteFooter() {
         <FooterLinks title="Important Links" links={importantLinks} />
         <div className="max-[760px]:col-span-full max-[420px]:col-span-full">
           <h3 className="mb-5.5 mt-1 text-[19px] font-semibold text-[#111] max-[760px]:text-[17px]">Address</h3>
-          <p className="mb-4.5 flex items-start gap-2.5 text-[14px] leading-[1.8] text-[#505156]"><MapPin className="mt-0.75 size-4.25 shrink-0 text-[#163e6a]" /> Shop-40 Liaqat Market Near New Memon Masjid Bolton Market M.A Jinnah Road Karachi, Pakistan</p>
+          <p className="mb-4.5 flex items-start gap-2.5 text-[14px] leading-[1.8] text-[#505156]"><MapPin className="mt-0.75 size-4.25 shrink-0 text-[#163e6a]" /> Shop #4, Mezzanine Floor, Sheikh Mansion, Out Ram Road, Haqqani Chowk, Karachi.</p>
           <h3 className="mb-3.25 mt-5 text-[19px] font-semibold text-[#111] max-[760px]:text-[17px]">Chat with us</h3>
           <div className="flex gap-2.75">
             <a className="text-[#163e6a] transition-colors hover:opacity-80" href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Chat on Facebook"><FaFacebook className="size-8.5" /></a>
-            <a className="text-[#e1306c] transition-colors hover:opacity-80" href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Chat on Instagram"><FaInstagram className="size-8.5" /></a>
-            <a className="text-[#25d366] transition-colors hover:opacity-80" href="https://wa.me/923363587468" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp"><FaWhatsapp className="size-8.5" /></a>
+            <a className="text-[#e1306c] transition-colors hover:opacity-80" href="https://instagram.com/godelivery_express?xtok=MTRiMG5tY2ZxN2l6cA%3D%3D" target="_blank" rel="noreferrer" aria-label="Follow Go Delivery Express on Instagram"><FaInstagram className="size-8.5" /></a>
+            <a className="text-[#25d366] transition-colors hover:opacity-80" href="https://wa.me/923152402683" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp at +92-3152402683"><FaWhatsapp className="size-8.5" /></a>
           </div>
         </div>
       </div>
